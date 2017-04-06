@@ -240,21 +240,14 @@ function display_chants(data) {
   // Get list of seasons, contained in the keys of the main data
   seasons = Object.keys(data);
 
-
   // Loop through seasons
-
-  var i = 0;
-  for (var chants_within_season in data) {
-//  for (var i = 0; i < data.length; i++) {
-    var season = seasons[i];
-
-//    console.log("Outputing Season : " + season);
+  for (var season in data) {
+    var chants_within_season = data[season];
 
     display_season_heading(season);
     display_season_chants(chants_within_season);
     display_season_footing();
 
-    i++;
   } // end season loop
 
 
@@ -291,12 +284,13 @@ function display_season_heading(season) {
 } // end display_season_footing
 
 function display_season_chants(chants_within_season) {
-//    console.log("Sorting through chants in " + season);
+    console.log("Sorting through chants in SEASON");
+    console.dir(chants_within_season);
 
     for (var chant in chants_within_season) {
       display_single_chant(chant, "body");
     } // end loop within season
-}
+} // end display_season_chants
 
 
 

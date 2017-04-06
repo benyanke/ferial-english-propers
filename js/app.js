@@ -52,6 +52,7 @@ function processdata() {
   // Creates a nested array from the flat array, seperating by season
   data = nest_chants_by_season(data);
 
+  create_nav(data);
 
   console.dir(data);
 
@@ -177,3 +178,42 @@ function nest_chants_by_season(data) {
   return out;
 
 } // end nest_chants_by_season
+
+
+function create_nav(data) {
+  console.log("Creating navigation from season list");
+
+  // Get list of seasons, contained in the keys of the main data
+  seasons = Object.keys(data);
+
+  for (var i = 0; i < seasons.length; i++) {
+    var season = seasons[i];
+    console.log("Adding nav entry for " + season);
+    $("#nav").append("<li><a class=\"page-scroll\" href=\"#about\">About</a></li>")
+
+    // Sanitize for use within url
+
+    // Convert to lowercase
+    id = season.toLowerCase();
+
+    // Convert special characters to space
+    id = id.replace(/[^a-zA-Z0-9]/g, ' ');
+
+    // Convert spaces to hyphen
+    id = id.replace(/\s+/g, '-');
+
+    add_nav_entry(season, id);
+  } // end loop through season
+
+} // end create_nav
+
+
+function add_nav_entry(name, id) {
+
+  $('ul.nav').append(
+    $('<li>').attr('class','page-scroll').append(
+      $('<a>').attr('href','#' + id).append(name)
+  ));
+
+  return 0;
+} // end add_nav_entry

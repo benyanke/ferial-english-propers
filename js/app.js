@@ -19,32 +19,38 @@ var data; // reformatted json
 var fade = false;
 var fadetime = "slow";
 
-console.log( "Data source: " + source );
-
-
-var jqxhr = $.get( source, function(datafromweb) {
-  console.log( "Data loaded from Google successfully");
-  rawdata = datafromweb
-//  alert( "success" );
-  processdata();
-})
-  .fail(function() {
-    console.log( "There was an error connecting to data. Can not continue" );
-  })
-/*  .always(function() {
-    alert( "finished" );
-  });
-*/
-// Perform other work here ...
- 
-// Set another completion function for the request above
-
-/* jqxhr.always(function() {
-  alert( "second finished" );
+/* MAIN */
+$( document ).ready(function() {
+  get_chants();
 });
-*/
 
+function get_chants() {
 
+  console.log( "Data source: " + source );
+
+  var jqxhr = $.get( source, function(datafromweb) {
+    console.log( "Data loaded from Google successfully");
+    rawdata = datafromweb
+  //  alert( "success" );
+    processdata();
+  })
+    .fail(function() {
+      console.log( "There was an error connecting to data. Can not continue" );
+    })
+  /*  .always(function() {
+      alert( "finished" );
+    });
+  */
+  // Perform other work here ...
+
+  // Set another completion function for the request above
+
+  /* jqxhr.always(function() {
+    alert( "second finished" );
+  });
+  */
+
+}
 
 function processdata() {
   var debug = JSON.stringify(rawdata);
@@ -245,7 +251,7 @@ function display_chants(data) {
     var chants_within_season = data[season];
 
     display_season_heading(season);
-    display_season_chants(chants_within_season);
+    display_season_chants(chants_within_season, season);
     display_season_footing();
 
   } // end season loop
@@ -276,14 +282,14 @@ function display_season_footing(season) {
 
 } // end display_season_footing
 
-function display_season_chants(chants_within_season) {
-  console.log("Sorting through chants in SEASON");
-
+function display_season_chants(chants_within_season, season) {
+//  console.log("Sorting through chants in SEASON");
+  var season_id = sanitize_season_name(season);
 
   for (var i = 0; i < chants_within_season.length; i++) {
     var chant = chants_within_season[i];
 
-    display_single_chant(chant, "body");
+    display_single_chant(chant, "#" + season_id);
 
   } // end loop within season
 
@@ -294,58 +300,59 @@ function display_season_chants(chants_within_season) {
 
 function display_single_chant(chant, appendto) {
 
-  console.log("Displaying \"" + chant.incipit.latin + "\"");
+//  console.log("Displaying \"" + chant.incipit.latin + "\"");
 
-  // Create container for chant
-  $(appendto).append(`<span id=chantid` + chant.id + `>` + chant.incipit.latin + `</div><br />`);
+  var gabc_code;
+  var chantscore = [];
+  var ctxt;
 
-
-
-  // Setting up exsurge
-  var ctxt = new exsurge.ChantContext();
-
+  score_div_id = "chantid-" + chant.id;
 
   // Select proper GABC file
   if(chant.score.aae_raw.length > 10) {
-    var gabc = chant.score.aae_raw;
+    gabc_code = chant.score.aae_raw;
   } else if(chant.score.by_raw.length > 10) {
-    var gabc = chant.score.by_raw;
+    gabc_code = chant.score.by_raw;
   } else {
     return 0;
   }
 
+//  gabc_code = "(c4) CHris(ffg)tus(f.)";
 
-//   document.write(gabc);
-
-    var ctxt = new exsurge.ChantContext();
-    ctxt.lyricTextFont = "'Crimson Text', serif";
-    ctxt.lyricTextSize *= 1.2;
-    ctxt.dropCapTextFont = ctxt.lyricTextFont;
-    ctxt.annotationTextFont = ctxt.lyricTextFont;
-    var score;
-    var gabcSource = document.getElementById('gabcSource');
-    var chantContainer = document.getElementById('chant-container');
+  // Create container for chant
+  $(appendto).append(`<div id=` + score_div_id + ` class="chantscore"><span class="hideonload">loading..</span></div><br />`);
 
 
+  // Set up up exsurge
 
-/*
+  var ctxt = new exsurge.ChantContext();
+  ctxt.lyricTextFont = "'Crimson Text', serif";
+  ctxt.lyricTextSize *= 1.2;
+  ctxt.dropCapTextFont = ctxt.lyricTextFont;
+  ctxt.annotationTextFont = ctxt.lyricTextFont;
+  var score;
+  var gabcSource = gabc_code;
+  var chantContainer = document.getElementById(score_div_id);
 
-  var score = exsurge.Gabc.loadChantScore(ctxt, gabc, true);
+  ctxt = new exsurge.ChantContext();
 
-  // perform layout on the chant
-  score.performLayout(ctxt, function() {
-    score.layoutChantLines(ctxt, 1000, function() {
+    if (score) {
+      exsurge.Gabc.updateMappingsFromSource(ctxt, score.mappings, gabc_code);
+      score.updateNotations(ctxt);
+    } else {
+      mappings = exsurge.Gabc.createMappingsFromSource(ctxt, gabc_code);
+      score = new exsurge.ChantScore(ctxt, mappings, true);
+      score.annotation = new exsurge.Annotation(ctxt, "%V%");
+    }
 
-      // render the score to svg code
-      var svgNode = document.createElement('div');
-      var innerHtml = score.createDrawable(ctxt);
-      svgNode.innerHTML = innerHtml;
-      document.body.appendChild(svgNode);
+    // perform layout on the chant
+    score.performLayoutAsync(ctxt, function() {
+      score.layoutChantLines(ctxt, chantContainer.clientWidth, function() {
+        // render the score to svg code
+        chantContainer.innerHTML = score.createSvg(ctxt);
+      });
     });
-  });
 
-
-*/
 
 
 
@@ -366,4 +373,3 @@ function sanitize_season_name(season) {
   return id;
 
 } //end sanitize_season_name
-

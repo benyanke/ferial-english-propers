@@ -46,12 +46,19 @@ var jqxhr = $.get( source, function(datafromweb) {
 function processdata() {
   var debug = JSON.stringify(rawdata);
 
-  // Process the data into a more usable format
+  // Change the headings into human-readable headings
   data = cleanupdata(rawdata);
+
+  // Creates a nested array from the flat array, seperating by season
+  data = nest_chants_by_season(data);
+
+
   console.dir(data);
 
 }
 
+// Converts from Google Spreadsheet's confusing headings to human readable data headings
+// Does not minipulate data beyond changing headings
 function cleanupdata(rawdata) {
 
   // final output array
@@ -69,11 +76,14 @@ function cleanupdata(rawdata) {
 
     // Parse data
 
-    // row ID
     tmp.id = row.gsx$_cn6ca.$t;
     tmp.last_updated = row.updated.$t;
     tmp.season = row.gsx$season.$t;
-    tmp.week = row.gsx$wk.$t;
+    tmp.day_type = row.gsx$type.$t;
+    tmp.week = {
+      'roman' : row.gsx$wk.$t,
+      'int' : row.gsx$wkint.$t,
+    };
     tmp.days = row.gsx$days.$t;
     tmp.yrs = row.gsx$yrs.$t;
     tmp.dates = row.gsx$dates.$t;
@@ -109,7 +119,7 @@ function cleanupdata(rawdata) {
 
 
 
-    console.log(tmp)
+//    console.log(tmp)
 
     // Add parsed data to the output array
     out.push(tmp);
@@ -118,11 +128,52 @@ function cleanupdata(rawdata) {
   return out;
 }
 
-// function score(id, season, week, days, years, dates, notes, seppg, scripturevs, proper, mode, incipit-latin, incipit-sep-english, incipit-rm-english, incipit-other-english, co-verses, by-gabc, aae-gabc, private-note, gr-pg, fep-pg, gabc, of-vs, duplicate, sep-header, psalmtone-formula, psalmtone);
 
-/*
+function nest_chants_by_season(data) {
+  var out = {}; // final output
+  var seasons = []; // list of seasons found
 
-document.body.innerHTML = debug;
+//  console.log(data);
 
-console.log(rawdata);
-*/
+  // Get unique list of seasons from source data
+  for (var i = 0; i < data.length; i++) {
+    var row = data[i];
+    var rowseason = row.season;
+
+    // Add seasons uniquely to season list
+    if(seasons.indexOf(row.season) === -1) {
+      seasons.push(row.season);
+    }
+  } // end season-list for loop
+
+
+
+  // Convert to a nested array by season, then by week
+  // This is not efficient, O(n^2)
+  // TODO: rewrite later to do in O(n) time.
+  for (var i = 0; i < seasons.length; i++) {
+    var season = seasons[i];
+    var tmp = [];
+
+//    console.log("Starting sorting \"" + season + "\" chants");
+
+    for (var j = 0; j < data.length; j++) {
+      var row = data[j];
+
+      // if the row matches, push to the tmp
+      if(row.season == season) {
+        tmp.push(row);
+      } //end season if
+    } //end data for loop
+
+    out[season] = tmp;
+
+  } // end nested array conversion
+
+
+  console.log("Finished sorting chants by season");
+
+  // return ALSO outputs to console
+  return out;
+
+} // end nest_chants_by_season

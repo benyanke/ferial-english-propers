@@ -266,7 +266,7 @@ function display_season_heading(season) {
 
 } // end display_season_heading
 
-	function display_season_footing(season) {
+function display_season_footing(season) {
 
   $("body").append(`
                 </div>
@@ -296,14 +296,40 @@ function display_single_chant(chant, appendto) {
 
   console.log("Displaying \"" + chant.incipit.latin + "\"");
 
+  // Create container for chant
+  $(appendto).append(`<span id=chantid` + chant.id + `>` + chant.incipit.latin + `</div><br />`);
+
+
+
   // Setting up exsurge
   var ctxt = new exsurge.ChantContext();
 
+
+  // Select proper GABC file
   if(chant.score.aae_raw.length > 10) {
     var gabc = chant.score.aae_raw;
-  } else {
+  } else if(chant.score.by_raw.length > 10) {
     var gabc = chant.score.by_raw;
+  } else {
+    return 0;
   }
+
+
+//   document.write(gabc);
+
+    var ctxt = new exsurge.ChantContext();
+    ctxt.lyricTextFont = "'Crimson Text', serif";
+    ctxt.lyricTextSize *= 1.2;
+    ctxt.dropCapTextFont = ctxt.lyricTextFont;
+    ctxt.annotationTextFont = ctxt.lyricTextFont;
+    var score;
+    var gabcSource = document.getElementById('gabcSource');
+    var chantContainer = document.getElementById('chant-container');
+
+
+
+/*
+
   var score = exsurge.Gabc.loadChantScore(ctxt, gabc, true);
 
   // perform layout on the chant
@@ -318,13 +344,10 @@ function display_single_chant(chant, appendto) {
     });
   });
 
-/*
-  $(appendto).append(`
-                </div>
-            </div>
-        </div>
-    </section>`);
+
 */
+
+
 
 } // end display_single_chant
 

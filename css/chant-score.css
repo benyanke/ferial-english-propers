@@ -1,5 +1,12 @@
 /* The score itself */
 
+.chantscore { 
+  width: 600px;
+  margin:0 auto;
+}
+
+/*
 .chantscore svg { 
   width: 600px;
 }
+*/

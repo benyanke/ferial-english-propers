@@ -19,6 +19,10 @@ var data; // reformatted json
 var fade = false;
 var fadetime = "slow";
 
+
+// score width
+var score_width = "500";
+
 /* MAIN */
 $( document ).ready(function() {
   get_chants();
@@ -320,7 +324,7 @@ function display_single_chant(chant, appendto) {
 //  gabc_code = "(c4) CHris(ffg)tus(f.)";
 
   // Create container for chant
-  $(appendto).append(`<div id=` + score_div_id + ` class="chantscore"><span class="hideonload">loading..</span></div><br />`);
+  $(appendto).append(`<div id=` + score_div_id + ` class="chantscore"><span class="hideonload">loading..</span></div><br /><br />`);
 
 
   // Set up up exsurge
@@ -347,13 +351,12 @@ function display_single_chant(chant, appendto) {
 
     // perform layout on the chant
     score.performLayoutAsync(ctxt, function() {
-      score.layoutChantLines(ctxt, chantContainer.clientWidth, function() {
+//      score.layoutChantLines(ctxt, chantContainer.clientWidth, function() {
+      score.layoutChantLines(ctxt, score_width, function() {
         // render the score to svg code
         chantContainer.innerHTML = score.createSvg(ctxt);
       });
     });
-
-
 
 
 } // end display_single_chant
@@ -373,3 +376,4 @@ function sanitize_season_name(season) {
   return id;
 
 } //end sanitize_season_name
+v

@@ -201,15 +201,7 @@ function create_nav(data) {
 //    console.log("Adding nav entry for " + season);
 
     // Sanitize for use within url
-
-    // Convert to lowercase
-    id = season.toLowerCase();
-
-    // Convert special characters to space
-    id = id.replace(/[^a-zA-Z0-9]/g, ' ');
-
-    // Convert spaces to hyphen
-    id = id.replace(/\s+/g, '-');
+    id = sanitize_season_name(season);
 
     add_nav_entry(season, id);
   } // end loop through season
@@ -243,17 +235,83 @@ function hide_loading_elements() {
 
 function display_chants(data) {
 
-  $("body").append(`<!-- Intro Section -->
-    <section id="intro" class="intro-section">
+//  console.log("Displaying all chants");
+
+  // Get list of seasons, contained in the keys of the main data
+  seasons = Object.keys(data);
+
+
+  // Loop through seasons
+
+  var i = 0;
+  for (var chants_within_season in data) {
+//  for (var i = 0; i < data.length; i++) {
+    var season = seasons[i];
+
+//    console.log("Outputing Season : " + season);
+
+    display_season_heading(season);
+    display_season_chants(chants_within_season);
+    display_season_footing();
+
+    i++;
+  } // end season loop
+
+
+} // end display_chants
+
+
+function display_single_chant(chant, appendto) {
+
+  console.log("Displaying chant");
+
+
+} // end display_single_chant
+
+function display_season_heading(season) {
+
+  $("body").append(`<!-- ` + season + ` Chants -->
+    <section id="` + sanitize_season_name(season) + `" class="intro-section">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1>Scrolling Nav</h1>
-                    <p><strong>Usage Instructions:</strong> Make sure to include the <code>scrolling-nav.js</code>, <code>jquery.easing.min.js</code>, and <code>scrolling-nav.css</code> file$
-                    <a class="btn btn-default page-scroll" href="#about">Click Me to Scroll Down!</a>
+                    <h1>` + season + `</h1>
+                    <p>Chants for ` + season + `</p>`);
+
+} // end display_season_heading
+
+	function display_season_footing(season) {
+
+  $("body").append(`
                 </div>
             </div>
         </div>
     </section>`);
 
-} // end display_chants
+} // end display_season_footing
+
+function display_season_chants(chants_within_season) {
+//    console.log("Sorting through chants in " + season);
+
+    for (var chant in chants_within_season) {
+      display_single_chant(chant, "body");
+    } // end loop within season
+}
+
+
+
+function sanitize_season_name(season) {
+
+  // Convert to lowercase
+  id = season.toLowerCase();
+
+  // Convert special characters to space
+  id = id.replace(/[^a-zA-Z0-9]/g, ' ');
+
+  // Convert spaces to hyphen
+  id = id.replace(/\s+/g, '-');
+
+  return id;
+
+} //end sanitize_season_name
+

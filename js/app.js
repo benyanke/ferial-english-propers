@@ -17,7 +17,7 @@ var data; // reformatted json
 
 // Not yet fully working, leave disabled
 var fade = false;
-var fadetime = "fast";
+var fadetime = "slow";
 
 console.log( "Data source: " + source );
 

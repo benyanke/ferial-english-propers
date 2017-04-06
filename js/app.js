@@ -15,6 +15,9 @@ var source="https://spreadsheets.google.com/feeds/list/16PYP_tEqubwKEZlfqZLwiVyd
 var rawdata = null; // raw json from google drive
 var data; // reformatted json
 
+// Not yet fully working, leave disabled
+var fade = false;
+var fadetime = "fast";
 
 console.log( "Data source: " + source );
 
@@ -52,8 +55,18 @@ function processdata() {
   // Creates a nested array from the flat array, seperating by season
   data = nest_chants_by_season(data);
 
+  // Create the navigation by season
   create_nav(data);
 
+  // Display chants
+  display_chants(data);
+
+  // When loading is complete, hide all the "loading" elements around the page
+  hide_loading_elements();
+
+  // debugging lines
+  console.log("");
+  console.log("For the curious, here's our chant list:");
   console.dir(data);
 
 }
@@ -68,15 +81,12 @@ function cleanupdata(rawdata) {
   // Get the main data body - ignore spreadsheet metadata
   data = rawdata.feed.entry;
 
-
+  // Loop through raw data to reformat
   for (var i = 0; i < data.length; i++) {
     var row = data[i];
     var tmp = {}; // to be added to output array at end of loop instance
 
-//    console.dir(row);
-
-    // Parse data
-
+    // Parse data into a new array with clearer headers
     tmp.id = row.gsx$_cn6ca.$t;
     tmp.last_updated = row.updated.$t;
     tmp.season = row.gsx$season.$t;
@@ -188,8 +198,7 @@ function create_nav(data) {
 
   for (var i = 0; i < seasons.length; i++) {
     var season = seasons[i];
-    console.log("Adding nav entry for " + season);
-    $("#nav").append("<li><a class=\"page-scroll\" href=\"#about\">About</a></li>")
+//    console.log("Adding nav entry for " + season);
 
     // Sanitize for use within url
 
@@ -217,3 +226,34 @@ function add_nav_entry(name, id) {
 
   return 0;
 } // end add_nav_entry
+
+
+// Call this on load completion
+function hide_loading_elements() {
+  console.log("Loading complete, hiding \"loading\" elements");
+
+  if(fade) {
+    $('.hideonload').fadeOut(fadetime);
+  } else {
+    $('.hideonload').hide();
+  }
+
+}
+
+
+function display_chants(data) {
+
+  $("body").append(`<!-- Intro Section -->
+    <section id="intro" class="intro-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1>Scrolling Nav</h1>
+                    <p><strong>Usage Instructions:</strong> Make sure to include the <code>scrolling-nav.js</code>, <code>jquery.easing.min.js</code>, and <code>scrolling-nav.css</code> file$
+                    <a class="btn btn-default page-scroll" href="#about">Click Me to Scroll Down!</a>
+                </div>
+            </div>
+        </div>
+    </section>`);
+
+} // end display_chants

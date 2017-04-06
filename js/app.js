@@ -4,12 +4,6 @@
 *
 */
 
-/* Steps:
-* Get JSON
-* Select seasons from json, reformat into nested json array by season
-* Parse new json
-*/
-
 var source="https://spreadsheets.google.com/feeds/list/16PYP_tEqubwKEZlfqZLwiVydMQ6ZPV02w-rkOwI2S5I/od6/public/values?alt=json";
 // var source="https://brokenspreadsheets.google.com/feeds/list/16PYP_tEqubwKEZlfqZLwiVydMQ6ZPV02w-rkOwI2S5I/od6/public/values?alt=json";
 var rawdata = null; // raw json from google drive
@@ -23,9 +17,19 @@ var fadetime = "slow";
 // score width
 var score_width = "500";
 
+// Hide some elements right away
+$('.showonload').hide();
+
 /* MAIN */
 $( document ).ready(function() {
   get_chants();
+
+  // Temporary stopgap: start displaying chants 3 seconds before unhiding loading icon
+  // TODO: Obviously this needs to be optimized for speed at a later date
+  setTimeout(function(){
+    hide_loading_elements();
+  }, 3000);
+
 });
 
 function get_chants() {
@@ -70,9 +74,6 @@ function processdata() {
 
   // Display chants
   display_chants(data);
-
-  // When loading is complete, hide all the "loading" elements around the page
-  hide_loading_elements();
 
   // debugging lines
   console.log("");
@@ -232,15 +233,19 @@ function add_nav_entry(name, id) {
 
 // Call this on load completion
 function hide_loading_elements() {
-  console.log("Loading complete, hiding \"loading\" elements");
 
   if(fade) {
+    console.log("Loading complete, hiding \"loading\" elements - with fade");
     $('.hideonload').fadeOut(fadetime);
+    $('.showonload').fadeIn(fadetime);
   } else {
+    console.log("Loading complete, hiding \"loading\" elements");
     $('.hideonload').hide();
+    $('.showonload').show();
   }
 
 }
+
 
 
 function display_chants(data) {
@@ -267,7 +272,7 @@ function display_chants(data) {
 function display_season_heading(season) {
 
   $("body").append(`<!-- ` + season + ` Chants -->
-    <section id="` + sanitize_season_name(season) + `" class="intro-section">
+    <section id="` + sanitize_season_name(season) + `" class="intro-section showonload">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
@@ -357,7 +362,6 @@ function display_single_chant(chant, appendto) {
         chantContainer.innerHTML = score.createSvg(ctxt);
       });
     });
-
 
 } // end display_single_chant
 

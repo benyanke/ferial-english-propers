@@ -254,13 +254,6 @@ function display_chants(data) {
 } // end display_chants
 
 
-function display_single_chant(chant, appendto) {
-
-  console.log("Displaying chant");
-
-
-} // end display_single_chant
-
 function display_season_heading(season) {
 
   $("body").append(`<!-- ` + season + ` Chants -->
@@ -284,14 +277,56 @@ function display_season_heading(season) {
 } // end display_season_footing
 
 function display_season_chants(chants_within_season) {
-    console.log("Sorting through chants in SEASON");
-    console.dir(chants_within_season);
+  console.log("Sorting through chants in SEASON");
 
-    for (var chant in chants_within_season) {
-      display_single_chant(chant, "body");
-    } // end loop within season
+
+  for (var i = 0; i < chants_within_season.length; i++) {
+    var chant = chants_within_season[i];
+
+    display_single_chant(chant, "body");
+
+  } // end loop within season
+
 } // end display_season_chants
 
+
+
+
+function display_single_chant(chant, appendto) {
+
+  console.log("Displaying \"" + chant.incipit.latin + "\"");
+
+  // Setting up exsurge
+  var ctxt = new exsurge.ChantContext();
+
+  if(chant.score.aae_raw.length > 10) {
+    var gabc = chant.score.aae_raw;
+  } else {
+    var gabc = chant.score.by_raw;
+  }
+  var score = exsurge.Gabc.loadChantScore(ctxt, gabc, true);
+
+  // perform layout on the chant
+  score.performLayout(ctxt, function() {
+    score.layoutChantLines(ctxt, 1000, function() {
+
+      // render the score to svg code
+      var svgNode = document.createElement('div');
+      var innerHtml = score.createDrawable(ctxt);
+      svgNode.innerHTML = innerHtml;
+      document.body.appendChild(svgNode);
+    });
+  });
+
+/*
+  $(appendto).append(`
+                </div>
+            </div>
+        </div>
+    </section>`);
+*/
+
+} // end display_single_chant
 
 
 function sanitize_season_name(season) {

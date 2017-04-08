@@ -272,7 +272,7 @@ function display_chants(data) {
 function display_season_heading(season) {
 
   $("body").append(`<!-- ` + season + ` Chants -->
-    <section id="` + sanitize_season_name(season) + `" class="intro-section showonload">
+    <section id="` + sanitize_season_name(season) + `" class="intro-section season showonload">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
